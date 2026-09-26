@@ -79,7 +79,11 @@ export default function Hero() {
             </div>
 
             {/* Cinematic vignette */}
-            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-black/10 to-black/65" />
+
+            <div className="absolute right-5 bottom-5 z-30 flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/60 bg-[#6da8ff]/90 text-xl shadow-lg shadow-[#6ea9ff]/40 backdrop-blur-sm sm:right-8 sm:bottom-8 sm:h-20 sm:w-20">
+                <span aria-hidden="true" className="select-none text-white">⌂</span>
+            </div>
 
             {/* Camera-move keyframes — one per effect, each timed to roughly fill a slide's on-screen duration */}
             <style>{`

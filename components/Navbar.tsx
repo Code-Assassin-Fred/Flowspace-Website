@@ -22,22 +22,21 @@ function Logo() {
     return (
         <a href="#" className="flex items-center gap-3 shrink-0">
             <svg width="50" height="50" viewBox="0 0 42 42" fill="none" aria-hidden="true">
-                {/* Dominant outer ring — orange */}
-                <circle cx="21" cy="21" r="19" stroke="#FF6600" strokeWidth="2.5" opacity="0.9" />
-                {/* Tilted ring — blue */}
-                <ellipse
-                    cx="21"
-                    cy="21"
-                    rx="19"
-                    ry="7"
-                    stroke="#0066FF"
-                    strokeWidth="2.5"
-                    transform="rotate(-25 21 21)"
-                />
-                <circle cx="21" cy="21" r="6.5" fill="#1B1B3A" />
-                <circle cx="21" cy="21" r="6.5" fill="#0066FF" fillOpacity="0.2" />
-                <circle cx="30.5" cy="12.5" r="2.5" fill="#FF6600" />
-            </svg>
+    {/* Dominant outer ring — orange */}
+    <circle cx="21" cy="21" r="19" stroke="#FF6600" strokeWidth="2.5" opacity="0.9" />
+    {/* Tilted ring — blue */}
+    <ellipse
+        cx="21"
+        cy="21"
+        rx="19"
+        ry="7"
+        stroke="#0066FF"
+        strokeWidth="2.5"
+        transform="rotate(-25 21 21)"
+    />
+    <circle cx="21" cy="21" r="6.5" fill="#1B1B3A" />
+    <circle cx="21" cy="21" r="6.5" fill="#0066FF" fillOpacity="0.2" />
+</svg>
             <span className="flex flex-col leading-none">
                 <span className="text-2xl font-bold tracking-tight text-[#1B1B3A]">
                     Flowspace
@@ -54,7 +53,7 @@ export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
-        <header className="w-full font-sans bg-white">
+        <header className="sticky top-0 z-50 w-full font-sans border-b border-[#E4E3EE] bg-white">
             {/* Brand + contact row */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-6 py-6">
                 <Logo />
