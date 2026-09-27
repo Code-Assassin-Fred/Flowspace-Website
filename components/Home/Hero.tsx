@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({
+    subsets: ["latin"],
+    style: ["normal", "italic"],
+    weight: ["400", "500", "600"],
+});
 
 /**
  * Background slideshow — instead of one continuous horizontal pan,
@@ -44,7 +51,7 @@ export default function Hero() {
     }, []);
 
     return (
-        <section id="home" className="relative h-[85vh] sm:h-screen min-h-[540px] sm:min-h-0 w-full overflow-hidden bg-neutral-950 scroll-mt-24">
+        <section id="home" className="relative w-full overflow-hidden bg-neutral-950 scroll-mt-24">
             {/* Slideshow — each slide gets its own camera move, crossfading into the next */}
             <div className="absolute inset-0 overflow-hidden">
                 {SLIDES.map((slide, index) => {
@@ -81,8 +88,27 @@ export default function Hero() {
             {/* Cinematic vignette */}
             <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-black/10 to-black/65" />
 
-            <div className="absolute right-5 bottom-5 z-30 flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/60 bg-[#6da8ff]/90 text-xl shadow-lg shadow-[#6ea9ff]/40 backdrop-blur-sm sm:right-8 sm:bottom-8 sm:h-20 sm:w-20">
-                <span aria-hidden="true" className="select-none text-white">⌂</span>
+            {/* Blue foreground wash, like the inspiration */}
+            <div className="pointer-events-none absolute inset-0 z-[15] bg-gradient-to-br from-[#1a2c66]/70 via-[#2c4a8f]/45 to-[#0f1a3d]/75" />
+
+            <div className="relative z-20 mx-auto max-w-4xl px-6 pt-10 pb-20 text-center sm:px-10 sm:pt-14 sm:pb-24">
+                    <h1
+                        className={`${playfair.className} text-[clamp(2.4rem,5.4vw,4.75rem)] font-normal leading-[1.08] tracking-tight text-white`}
+                    >
+                        Run your property,
+                        <br />
+                        not the other way around
+                    </h1>
+                    <p
+                        className={`${playfair.className} mx-auto mt-6 max-w-2xl text-[clamp(1.05rem,1.7vw,1.5rem)] font-normal leading-snug text-white/90 sm:mt-8`}
+                    >
+                        Rent, maintenance, tenants, and caretakers — all of it, in one dashboard, updated in real time.
+                    </p>
+                    <p
+                        className={`${playfair.className} mt-6 text-[clamp(1.1rem,1.9vw,1.65rem)] italic font-medium text-[#e3a63e] sm:mt-8`}
+                    >
+                        Ready to experience the Flowspace advantage?
+                </p>
             </div>
 
             {/* Camera-move keyframes — one per effect, each timed to roughly fill a slide's on-screen duration */}
