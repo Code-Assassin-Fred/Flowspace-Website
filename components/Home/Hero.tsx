@@ -91,7 +91,7 @@ export default function Hero() {
             {/* Blue foreground wash, like the inspiration */}
             <div className="pointer-events-none absolute inset-0 z-[15] bg-gradient-to-br from-[#1a2c66]/70 via-[#2c4a8f]/45 to-[#0f1a3d]/75" />
 
-            <div className="relative z-20 mx-auto max-w-4xl px-6 pt-10 pb-20 text-center sm:px-10 sm:pt-14 sm:pb-24">
+            <div className="relative z-20 mx-auto max-w-4xl px-6 pt-16 pb-20 text-center sm:px-10 sm:pt-20 sm:pb-24">
                     <h1
                         className={`${playfair.className} text-[clamp(2.4rem,5.4vw,4.75rem)] font-normal leading-[1.08] tracking-tight text-white`}
                     >
