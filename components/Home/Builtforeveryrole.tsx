@@ -13,8 +13,10 @@ const playfair = Playfair_Display({
  * on the home page, between the hero and the "Ready to experience the Flowspace advantage?" block.
  */
 
-const NAVY = "#001260";
+// Section background matches the footer's gradient (same left/right stops as Footer.tsx)
+const SECTION_GRADIENT = "linear-gradient(to right, #405887, #4f6ba0)";
 const BLUE = "#0a3fe0";
+const RED = "#bb2036";
 
 type Role = {
     title: string;
@@ -108,7 +110,7 @@ function RoleText({ role }: { role: Role }) {
             <Link
                 href={role.href}
                 className="mt-8 inline-flex items-center gap-3 text-[1.35rem] font-bold hover:underline"
-                style={{ color: BLUE }}
+                style={{ color: RED }}
             >
                 {role.cta}
                 <Arrow />
@@ -245,7 +247,7 @@ function TenantMock() {
 
 export default function BuiltForEveryRole() {
     return (
-        <section className={`${playfair.className} [font-variant-numeric:lining-nums] px-4 py-10 sm:px-8 lg:py-14`} style={{ background: NAVY }}>
+        <section className={`${playfair.className} [font-variant-numeric:lining-nums] px-4 py-10 sm:px-8 lg:py-14`} style={{ background: SECTION_GRADIENT }}>
             <h2 className="mx-auto max-w-5xl text-center text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-tight text-white">
                 Built for every role
             </h2>
