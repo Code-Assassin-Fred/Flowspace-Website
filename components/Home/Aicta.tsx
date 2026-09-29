@@ -28,8 +28,7 @@ type Task = {
     label: string;
     unit: string;
     total: number;
-    start: number; // tick the task begins
-    speed: number; // % per tick
+    duration: number; // ticks to count from 0 to 100
     icon: React.ReactNode;
 };
 
@@ -48,8 +47,7 @@ const TASKS: Task[] = [
         label: "Reconcile M-Pesa rent payments",
         unit: "payments",
         total: 47,
-        start: 0,
-        speed: 1.6,
+        duration: 52,
         icon: (
             <span className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-[#0a8f3c] text-[13px] font-bold text-white">
                 M
@@ -60,8 +58,7 @@ const TASKS: Task[] = [
         label: "Flag overdue rent",
         unit: "units",
         total: 5,
-        start: 6,
-        speed: 2.2,
+        duration: 36,
         icon: (
             <span className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-[#d92d20]">
                 <svg {...svgProps}>
@@ -74,8 +71,7 @@ const TASKS: Task[] = [
         label: "Draft tenant reminders",
         unit: "messages",
         total: 5,
-        start: 14,
-        speed: 1.3,
+        duration: 40,
         icon: (
             <span className="flex h-6 w-6 items-center justify-center rounded-[3px]" style={{ background: BLUE }}>
                 <svg {...svgProps}>
@@ -89,8 +85,7 @@ const TASKS: Task[] = [
         label: "Summarize maintenance trends",
         unit: "requests",
         total: 12,
-        start: 22,
-        speed: 1.8,
+        duration: 48,
         icon: (
             <span className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-[#111827]">
                 <svg {...svgProps}>
@@ -101,23 +96,31 @@ const TASKS: Task[] = [
     },
 ];
 
-const HOLD_TICKS = 32; // pause on "all done" before the loop restarts
-const TICK_MS = 100;
-const LAST_TICK = Math.max(...TASKS.map((t) => t.start + 100 / t.speed)) + HOLD_TICKS;
+const TICK_MS = 50;
+const GAP_TICKS = 12; // short beat between one task finishing and the next appearing
+const HOLD_TICKS = 60; // pause on "all done" before the loop restarts
 
-function progressAt(task: Task, tick: number) {
-    return Math.min(100, Math.max(0, Math.round((tick - task.start) * task.speed)));
+// Each task starts only after the previous one reaches 100
+const STARTS = TASKS.reduce<number[]>((acc, _task, i) => {
+    acc.push(i === 0 ? 0 : acc[i - 1] + TASKS[i - 1].duration + GAP_TICKS);
+    return acc;
+}, []);
+const LAST_TICK = STARTS[STARTS.length - 1] + TASKS[TASKS.length - 1].duration + HOLD_TICKS;
+
+function progressAt(task: Task, start: number, tick: number) {
+    return Math.min(100, Math.max(0, Math.round(((tick - start) / task.duration) * 100)));
 }
 
-function Row({ task, tick }: { task: Task; tick: number }) {
-    const pct = progressAt(task, tick);
+function Row({ task, start, tick }: { task: Task; start: number; tick: number }) {
+    if (tick < start) return null;
+    const pct = progressAt(task, start, tick);
     const done = pct >= 100;
     const running = pct > 0 && !done;
     const count = Math.round((task.total * pct) / 100);
 
     return (
         <li
-            className="flex items-center gap-3 rounded-[4px] px-3 py-2.5 sm:px-4 sm:py-3"
+            className={`flex items-center gap-3 rounded-[4px] px-3 py-2.5 sm:px-4 sm:py-3 aic-row-in`}
             style={{ background: "linear-gradient(90deg,#f3f5f8 0%,#dfe4ea 55%,#7b828b 100%)" }}
         >
             {task.icon}
@@ -179,18 +182,20 @@ function TaskPanel() {
             style={{ background: "linear-gradient(90deg,#e6ebf1 0%,#cbd2db 50%,#2b3038 100%)" }}
         >
             <div className="flex items-center gap-3">
-                <span
-                    aria-hidden="true"
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0b1b4d]"
-                >
-                    <span className="h-3 w-3 rounded-full border-2 border-[#f7d36b]" />
-                </span>
                 <p className="text-[1.15rem] font-semibold text-neutral-900 sm:text-[1.3rem]">Task execution</p>
             </div>
 
-            <ul className="ml-3.5 mt-3 space-y-2.5 border-l-2 border-neutral-400 pl-4 sm:ml-[13px] sm:pl-5">
-                {TASKS.map((t) => (
-                    <Row key={t.label} task={t} tick={tick} />
+            <style>{`
+                @keyframes aic-row-in {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                .aic-row-in { animation: aic-row-in 350ms ease-out both; }
+                @media (prefers-reduced-motion: reduce) { .aic-row-in { animation: none; } }
+            `}</style>
+            <ul className="mt-3 space-y-2.5">
+                {TASKS.map((t, i) => (
+                    <Row key={t.label} task={t} start={STARTS[i]} tick={tick} />
                 ))}
             </ul>
         </div>
@@ -205,7 +210,7 @@ export default function AICta() {
             className={`${playfair.className} [font-variant-numeric:lining-nums] bg-white px-4 py-10 sm:px-8 lg:py-14`}
         >
             <div
-                className="mx-auto flex max-w-[1500px] flex-col items-start gap-8 rounded-[3px] px-7 py-12 sm:px-12 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-24 lg:py-[68px]"
+                className="mx-auto flex max-w-[1500px] flex-col items-start gap-8 rounded-[12px] px-7 py-12 sm:px-12 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-24 lg:py-[68px]"
                 style={{ background: NAVY }}
             >
                 <div className="max-w-[860px]">
@@ -228,37 +233,50 @@ export default function AICta() {
             </div>
 
             <div className="mx-auto mt-14 max-w-[1500px] lg:mt-20">
-                <div className="mx-auto max-w-3xl text-center">
-                    <h2 className="text-[clamp(1.9rem,3.6vw,3.25rem)] font-bold leading-[1.1] tracking-tight text-black">
-                        Meet your AI co-manager.
-                    </h2>
-                    <p className="mt-5 text-[clamp(1.05rem,1.5vw,1.3rem)] leading-relaxed text-neutral-800">
-                        Flowspace&apos;s AI reviews payments, flags overdue rent, drafts tenant messages, and summarizes
-                        maintenance trends — so you spend less time managing and more time owning. Available on Growth
-                        and Pro plans, and switchable month to month as your portfolio changes.
-                    </p>
-                    <Link
-                        href="/pricing"
-                        className="mt-6 inline-flex items-center gap-3 text-[1.25rem] font-bold hover:underline"
-                        style={{ color: BLUE }}
-                    >
-                        See what&apos;s included by plan
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-6 w-6" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16m-6-6 6 6-6 6" />
-                        </svg>
-                    </Link>
-                </div>
-
-                {/* Image + live task panel */}
-                <div className="relative mt-10 min-h-[480px] overflow-hidden rounded-[3px] bg-[#b9cbe3] sm:min-h-[560px] lg:mt-14 lg:aspect-[1600/824] lg:min-h-0">
+                {/* Image with the content on top of it */}
+                <div className="relative flex flex-col justify-between gap-10 overflow-hidden rounded-[6px] bg-white p-6 pt-48 sm:p-10 sm:pt-52 lg:aspect-[1600/900] lg:block lg:p-0">
                     <Image
                         src={IMAGE_SRC}
                         alt="A property owner outside a listed home"
                         fill
                         sizes="(min-width: 1500px) 1500px, 100vw"
-                        className="object-cover"
+                        className="object-cover brightness-[0.5]"
                     />
-                    <div className="absolute inset-x-3 bottom-3 sm:inset-x-6 sm:bottom-6 lg:inset-x-auto lg:bottom-[9%] lg:right-[6%] lg:w-[50%]">
+
+                    {/* Top fade: eases the image into the white page so the top edge disappears */}
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[180px]"
+                        style={{
+                            background:
+                                "linear-gradient(to bottom, #ffffff 0%, #ffffff 6%, rgba(255,255,255,0.97) 14%, rgba(255,255,255,0.9) 24%, rgba(255,255,255,0.78) 35%, rgba(255,255,255,0.62) 47%, rgba(255,255,255,0.44) 59%, rgba(255,255,255,0.27) 71%, rgba(255,255,255,0.13) 83%, rgba(255,255,255,0.04) 93%, rgba(255,255,255,0) 100%)",
+                        }}
+                    />
+
+                    {/* Text — top left */}
+                    <div className="relative z-10 lg:absolute lg:left-[5%] lg:top-[190px] lg:w-[42%]">
+                        <h2 className="text-[clamp(1.9rem,3.4vw,3.25rem)] font-bold leading-[1.1] tracking-tight text-white">
+                            Meet your AI co-manager.
+                        </h2>
+                        <p className="mt-5 text-[clamp(1rem,1.35vw,1.25rem)] leading-relaxed text-white">
+                            Flowspace&apos;s AI reviews payments, flags overdue rent, drafts tenant messages, and
+                            summarizes maintenance trends — so you spend less time managing and more time owning.
+                            Available on Growth and Pro plans, and switchable month to month as your portfolio
+                            changes.
+                        </p>
+                        <Link
+                            href="/pricing"
+                            className="mt-6 inline-flex items-center gap-3 rounded-[3px] border-2 border-[#bb2036] bg-[#bb2036] px-6 py-3.5 text-[1.15rem] font-bold text-white hover:border-[#8f1728] hover:bg-[#8f1728]"
+                        >
+                            See what&apos;s included by plan
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16m-6-6 6 6-6 6" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    {/* Live task panel — bottom right */}
+                    <div className="relative z-10 lg:absolute lg:bottom-[9%] lg:right-[4%] lg:w-[46%]">
                         <TaskPanel />
                     </div>
                 </div>

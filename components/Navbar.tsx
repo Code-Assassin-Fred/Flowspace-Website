@@ -38,7 +38,7 @@ function Logo() {
     <circle cx="21" cy="21" r="6.5" fill="#0066FF" fillOpacity="0.2" />
 </svg>
             <span className="flex flex-col leading-none">
-                <span className="text-2xl font-bold tracking-tight text-[#1B1B3A]">
+                <span className="text-2xl font-bold tracking-tight text-[#bb2036]">
                     Flowspace
                 </span>
                 <span className="text-sm font-bold tracking-[0.3em] text-[#0066FF]">
