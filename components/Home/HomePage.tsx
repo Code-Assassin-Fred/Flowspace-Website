@@ -2,6 +2,7 @@ import Hero from './Hero';
 import CTAStrip from './Ctastrip';
 import AboutPage from './About';
 import BuiltForEveryRole from './Builtforeveryrole';
+import Aicta from './Aicta';
 
 export default function HomePage() {
     return (
@@ -10,6 +11,7 @@ export default function HomePage() {
             <CTAStrip />
             <AboutPage />
             <BuiltForEveryRole />
+            <Aicta />
         </div>
     );
 }
