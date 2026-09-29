@@ -4,6 +4,7 @@ import AboutPage from './About';
 import BuiltForEveryRole from './Builtforeveryrole';
 import Aicta from './Aicta';
 import Pricing from './Pricing';
+import Contact from './Contact';
 
 export default function HomePage() {
     return (
@@ -14,6 +15,7 @@ export default function HomePage() {
             <BuiltForEveryRole />
             <Aicta />
             <Pricing />
+            <Contact />
         </div>
     );
 }

@@ -86,19 +86,12 @@ const TIERS: Tier[] = [
 
 export default function Pricing() {
     return (
-        <section id="pricing" className="w-full bg-[#264e5d] px-6 py-20 sm:py-28">
-            <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 text-center">
-                <span className="text-sm font-medium text-white/60">Pricing</span>
-                <h2 className="max-w-xl text-3xl font-bold text-white sm:text-4xl">
-                    Choose how hands-off you want to be.
-                </h2>
-                <p className="max-w-lg text-white/70">
-                    Every plan includes the full dashboard. What changes is how
-                    much of the work your AI takes off your hands.
-                </p>
-            </div>
+        <section id="pricing" className="w-full bg-[#264e5d] px-6 py-16 sm:py-20">
+            <h2 className="mx-auto whitespace-nowrap text-center text-[clamp(1rem,4.4vw,2.5rem)] font-bold text-white">
+                Choose how hands-off you want to be.
+            </h2>
 
-            <div className="mx-auto mt-14 grid max-w-6xl grid-cols-1 items-stretch gap-6 md:grid-cols-3">
+            <div className="mx-auto mt-12 grid max-w-6xl grid-cols-1 items-stretch gap-6 md:grid-cols-3">
                 {TIERS.map((tier) => {
                     const featured = tier.featured;
 
@@ -106,9 +99,7 @@ export default function Pricing() {
                         <div
                             key={tier.name}
                             className={`relative flex flex-col rounded-2xl p-8 ${
-                                featured
-                                    ? "bg-[#bb2036] text-white shadow-xl shadow-black/20 md:-translate-y-3"
-                                    : "bg-[#F4F4F2] text-[#1B1B3A]"
+                                featured ? "bg-[#bb2036] text-white" : "bg-[#F4F4F2] text-[#1B1B3A]"
                             }`}
                         >
                             {featured && (
@@ -118,39 +109,24 @@ export default function Pricing() {
                             )}
 
                             <h3 className="text-xl font-semibold">{tier.name}</h3>
-                            <p
-                                className={`mt-1 text-sm ${
-                                    featured ? "text-white/80" : "text-[#3A3A52]"
-                                }`}
-                            >
+                            <p className={`mt-1 text-sm ${featured ? "text-[#f6dde1]" : "text-[#3A3A52]"}`}>
                                 {tier.tagline}
                             </p>
 
                             <div className="mt-6 flex items-baseline gap-2">
                                 <span className="text-3xl font-bold">{tier.price}</span>
                             </div>
-                            <span
-                                className={`text-xs ${
-                                    featured ? "text-white/70" : "text-[#6B6B85]"
-                                }`}
-                            >
+                            <span className={`text-xs ${featured ? "text-[#f0cdd3]" : "text-[#6B6B85]"}`}>
                                 {tier.priceNote}
                             </span>
 
-                            <a
-                                href="#"
-                                className={`mt-6 inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-colors ${
-                                    featured
-                                        ? "bg-white text-[#bb2036] hover:bg-white/90"
-                                        : "bg-[#1B1B3A] text-white hover:bg-[#0066FF]"
-                                }`}
-                            >
-                                {tier.cta}
-                            </a>
-
-                            <div className="mt-8 flex flex-1 flex-col gap-6">
+                            <div className="mt-8 flex flex-1 flex-col justify-between gap-6">
                                 {tier.groups.map((group) => (
-                                    <div key={group.label}>
+                                    <div
+                                        key={group.label}
+                                        className="flex flex-col"
+                                        style={{ flexGrow: group.items.length }}
+                                    >
                                         <p
                                             className={`text-sm font-semibold ${
                                                 featured ? "text-white" : "text-[#1B1B3A]"
@@ -158,32 +134,32 @@ export default function Pricing() {
                                         >
                                             {group.label}
                                         </p>
-                                        <ul className="mt-3 flex flex-col gap-3 text-sm">
+                                        <ul className="mt-3 flex flex-1 flex-col justify-between gap-3 text-sm">
                                             {group.items.map((feature) => (
-                                                <li
-                                                    key={feature}
-                                                    className={`border-l-2 pl-3 ${
-                                                        featured
-                                                            ? "border-white/50"
-                                                            : "border-[#0066FF]/40"
-                                                    }`}
-                                                >
-                                                    {feature}
-                                                </li>
+                                                <li key={feature}>{feature}</li>
                                             ))}
                                         </ul>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* CTA: pinned to the bottom of the card, fit-width, right-aligned */}
+                            <div className="mt-auto flex justify-end pt-8">
+                                <a
+                                    href="#"
+                                    className={`inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-colors ${
+                                        featured
+                                            ? "bg-white text-[#bb2036] hover:bg-[#f3f4f6]"
+                                            : "bg-[#1B1B3A] text-white hover:bg-[#0066FF]"
+                                    }`}
+                                >
+                                    {tier.cta}
+                                </a>
+                            </div>
                         </div>
                     );
                 })}
             </div>
-
-            <p className="mt-10 text-center text-xs text-white/50">
-                Switch plans any month — your AI&apos;s role changes with it,
-                nothing else does.
-            </p>
         </section>
     );
 }
