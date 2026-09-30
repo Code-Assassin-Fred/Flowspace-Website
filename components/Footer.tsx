@@ -1,6 +1,6 @@
 const QUICK_LINKS = [
     { label: "Home", href: "#" },
-    { label: "Properties", href: "#" },
+    { label: "Properties", href: "/properties" },
     { label: "For Landlords", href: "#" },
     { label: "For Caretakers", href: "#" },
     { label: "For Tenants", href: "#" },
