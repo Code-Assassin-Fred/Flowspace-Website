@@ -1,9 +1,9 @@
 const QUICK_LINKS = [
     { label: "Home", href: "#" },
     { label: "Properties", href: "/properties" },
-    { label: "For Landlords", href: "#" },
+    { label: "For Landlords", href: "/landlords" },
     { label: "For Caretakers", href: "#" },
-    { label: "For Tenants", href: "#" },
+    { label: "For Tenants", href: "/tenants" },
     { label: "Pricing", href: "#" },
     { label: "About Us", href: "#" },
     { label: "Contact Us", href: "#" },
