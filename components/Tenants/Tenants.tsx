@@ -94,9 +94,6 @@ export default function Tenant() {
                 <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
                     {FEATURES.map((feature) => (
                         <div key={feature.title} className="flex flex-col p-8" style={{ background: CARD_BLUE }}>
-                            <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#6ea8ff" }}>
-                                Included in every plan
-                            </span>
                             <h3 className="mt-3 text-2xl font-bold text-white">{feature.title}</h3>
                             <p className="mt-4 text-sm leading-relaxed text-white/80">
                                 {feature.description}
