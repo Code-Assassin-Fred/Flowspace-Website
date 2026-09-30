@@ -1,6 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({
+    subsets: ["latin"],
+    style: ["normal", "italic"],
+    weight: ["400", "500", "600", "700"],
+});
 
 /**
  * Properties / Marketplace page.
@@ -9,14 +16,14 @@ import { useMemo, useState } from "react";
  *
  * Amenities are "powered by Google Maps" two ways, neither requiring a paid
  * API key:
- *   1. Each listing's map preview uses the public Maps embed pattern
- *      (`google.com/maps?q=lat,lng&output=embed`). For production, swap this
- *      for the official Maps Embed API URL with your own key — same src
- *      shape, just add `&key=YOUR_KEY` and switch the host to
- *      `www.google.com/maps/embed/v1/place`.
- *   2. "Nearby" category links open a real Google Maps search
- *      (schools / hospitals / matatu stage / supermarkets) centered on the
- *      listing's coordinates, in a new tab.
+ *   1. Every listing card carries its own live map preview using the public
+ *      Maps embed pattern (`google.com/maps?q=lat,lng&output=embed`). For
+ *      production, swap this for the official Maps Embed API URL with your
+ *      own key — same src shape, just add `&key=YOUR_KEY` and switch the
+ *      host to `www.google.com/maps/embed/v1/place`.
+ *   2. "View Amenities" opens a modal with "Nearby" category links that open
+ *      a real Google Maps search (schools / hospitals / matatu stage /
+ *      supermarkets) centered on the listing's coordinates, in a new tab.
  */
 
 const NAVY = "#1B1B3A";
@@ -25,6 +32,7 @@ const RED = "#bb2036";
 const MUTED = "#3A3A52";
 const BORDER = "#E4E3EE";
 const SURFACE = "#F4F4F2";
+const STEP_BG = "#264e5d";
 
 type Listing = {
     id: string;
@@ -39,7 +47,6 @@ type Listing = {
     description: string;
     features: string[];
     petPolicy: string;
-    verified: boolean;
     landlordOnFlowspace: boolean;
     lat: number;
     lng: number;
@@ -63,7 +70,6 @@ const LISTINGS: Listing[] = [
             "A 3-minute walk to Yaya Centre, with backup water and reliable fibre already wired in.",
         features: ["Parking", "Backup water", "Wi-Fi ready", "Gated compound"],
         petPolicy: "Cats allowed, small dogs allowed",
-        verified: true,
         landlordOnFlowspace: true,
         lat: -1.2905,
         lng: 36.782,
@@ -83,7 +89,6 @@ const LISTINGS: Listing[] = [
             "Quiet block set back from the road, with a dedicated caretaker on site around the clock.",
         features: ["Borehole water", "Secure parking", "CCTV"],
         petPolicy: "No pets",
-        verified: true,
         landlordOnFlowspace: false,
         lat: -1.2794,
         lng: 36.7783,
@@ -103,7 +108,6 @@ const LISTINGS: Listing[] = [
             "Own compound townhouse with a small garden, servant quarter, and two dedicated parking bays.",
         features: ["Garden", "DSQ", "Two parking bays", "Backup generator"],
         petPolicy: "Pets allowed",
-        verified: true,
         landlordOnFlowspace: true,
         lat: -1.2761,
         lng: 36.7666,
@@ -123,7 +127,6 @@ const LISTINGS: Listing[] = [
             "Compact studio close to Bellevue, ideal for a single tenant working nearby.",
         features: ["Water included", "Balcony"],
         petPolicy: "No pets",
-        verified: false,
         landlordOnFlowspace: false,
         lat: -1.3167,
         lng: 36.8333,
@@ -143,7 +146,6 @@ const LISTINGS: Listing[] = [
             "Walking distance to Sarit Centre, with a rooftop lounge and a lift in the building.",
         features: ["Lift", "Rooftop lounge", "Gym", "Parking"],
         petPolicy: "Cats allowed",
-        verified: true,
         landlordOnFlowspace: true,
         lat: -1.2673,
         lng: 36.8065,
@@ -163,7 +165,6 @@ const LISTINGS: Listing[] = [
             "Standalone bungalow with its own gate, five minutes from Two Rivers Mall.",
         features: ["Own gate", "Garden", "Parking"],
         petPolicy: "Pets allowed",
-        verified: false,
         landlordOnFlowspace: false,
         lat: -1.2039,
         lng: 36.7789,
@@ -206,7 +207,7 @@ function AmenitiesModal({
 }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 sm:p-8">
+            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-white p-6 sm:p-8">
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <p className="text-lg font-semibold" style={{ color: NAVY }}>
@@ -218,14 +219,14 @@ function AmenitiesModal({
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg border px-3 py-1.5 text-sm font-medium"
+                        className="border px-3 py-1.5 text-sm font-medium"
                         style={{ borderColor: BORDER, color: NAVY }}
                     >
                         Close
                     </button>
                 </div>
 
-                <div className="mt-5 overflow-hidden rounded-xl border" style={{ borderColor: BORDER }}>
+                <div className="mt-5 overflow-hidden border" style={{ borderColor: BORDER }}>
                     <iframe
                         title={`Map for ${listing.title}`}
                         src={mapEmbedSrc(listing.lat, listing.lng)}
@@ -247,7 +248,7 @@ function AmenitiesModal({
                             href={nearbySearchUrl(category, listing.lat, listing.lng)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="rounded-lg border px-3 py-2.5 text-center text-sm font-medium transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
+                            className="border px-3 py-2.5 text-center text-sm font-medium transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
                             style={{ borderColor: BORDER, color: NAVY }}
                         >
                             {category}
@@ -275,7 +276,7 @@ function ListingGallery({ images }: { images: string[] }) {
     return (
         <div className="w-full shrink-0 sm:w-48">
             <div
-                className="flex h-40 w-full items-center justify-center rounded-xl sm:h-36"
+                className="flex h-40 w-full items-center justify-center sm:h-36"
                 style={{ background: `linear-gradient(135deg, ${SURFACE}, ${BORDER})` }}
             >
                 <span className="text-xs font-medium" style={{ color: MUTED }}>
@@ -304,7 +305,7 @@ function ListingGallery({ images }: { images: string[] }) {
                             key={img}
                             onClick={() => setIndex(i)}
                             aria-label={`Show ${img}`}
-                            className="h-1.5 w-4 rounded-full transition-colors"
+                            className="h-1.5 w-4 transition-colors"
                             style={{ background: i === index ? BLUE : BORDER }}
                         />
                     ))}
@@ -319,68 +320,48 @@ function ListingGallery({ images }: { images: string[] }) {
 function ListingCard({
     listing,
     onViewAmenities,
-    onSelect,
-    selected,
 }: {
     listing: Listing;
     onViewAmenities: (listing: Listing) => void;
-    onSelect?: (listing: Listing) => void;
-    selected?: boolean;
 }) {
     return (
-        <div
-            className={`flex flex-col gap-5 rounded-2xl border bg-white p-5 sm:flex-row sm:p-6 ${
-                selected ? "ring-2 ring-[#0066FF]" : ""
-            }`}
-            style={{ borderColor: selected ? BLUE : BORDER }}
-        >
+        <div className="flex flex-col gap-5 border bg-white p-5 lg:flex-row sm:p-6" style={{ borderColor: BORDER }}>
             <ListingGallery images={listing.images} />
 
             <div className="flex flex-1 flex-col">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="flex flex-wrap gap-x-6 gap-y-2">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
-                                Rent
-                            </p>
-                            <p className="text-lg font-bold" style={{ color: NAVY }}>
-                                {formatKes(listing.rentKes)}/mo
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
-                                Size
-                            </p>
-                            <p className="text-lg font-bold" style={{ color: NAVY }}>
-                                {listing.sqft} sqft
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
-                                Bed / Bath
-                            </p>
-                            <p className="text-lg font-bold" style={{ color: NAVY }}>
-                                {listing.bedrooms} bd / {listing.bathrooms} ba
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
-                                Available
-                            </p>
-                            <p className="text-lg font-bold" style={{ color: NAVY }}>
-                                {listing.availableFrom}
-                            </p>
-                        </div>
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
+                            Rent
+                        </p>
+                        <p className="text-lg font-bold" style={{ color: NAVY }}>
+                            {formatKes(listing.rentKes)}/mo
+                        </p>
                     </div>
-
-                    {listing.verified && (
-                        <span
-                            className="h-fit rounded-full px-3 py-1 text-xs font-semibold text-white"
-                            style={{ background: RED }}
-                        >
-                            Verified unit
-                        </span>
-                    )}
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
+                            Size
+                        </p>
+                        <p className="text-lg font-bold" style={{ color: NAVY }}>
+                            {listing.sqft} sqft
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
+                            Bed / Bath
+                        </p>
+                        <p className="text-lg font-bold" style={{ color: NAVY }}>
+                            {listing.bedrooms} bd / {listing.bathrooms} ba
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: BLUE }}>
+                            Available
+                        </p>
+                        <p className="text-lg font-bold" style={{ color: NAVY }}>
+                            {listing.availableFrom}
+                        </p>
+                    </div>
                 </div>
 
                 <p className="mt-4 text-base font-semibold" style={{ color: NAVY }}>
@@ -409,34 +390,35 @@ function ListingCard({
 
                 <div className="mt-5 flex flex-wrap gap-3">
                     <button
-                        className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
+                        className="px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
                         style={{ background: BLUE }}
                     >
                         Express Interest
                     </button>
                     <button
-                        className="rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
+                        className="border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
                         style={{ borderColor: BORDER, color: NAVY }}
                     >
                         Schedule Viewing
                     </button>
                     <button
                         onClick={() => onViewAmenities(listing)}
-                        className="rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
+                        className="border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
                         style={{ borderColor: BORDER, color: NAVY }}
                     >
                         View Amenities
                     </button>
-                    {onSelect && (
-                        <button
-                            onClick={() => onSelect(listing)}
-                            className="rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
-                            style={{ borderColor: BORDER, color: NAVY }}
-                        >
-                            Show on Map
-                        </button>
-                    )}
                 </div>
+            </div>
+
+            {/* Real-time location map, filling the card's empty right-hand space */}
+            <div className="w-full shrink-0 overflow-hidden border lg:w-72" style={{ borderColor: BORDER }}>
+                <iframe
+                    title={`Map for ${listing.title}`}
+                    src={mapEmbedSrc(listing.lat, listing.lng)}
+                    className="h-40 w-full lg:h-full lg:min-h-[220px]"
+                    loading="lazy"
+                />
             </div>
         </div>
     );
@@ -450,9 +432,7 @@ export default function Rentals() {
     const [bedrooms, setBedrooms] = useState(BEDROOM_OPTIONS[0]);
     const [maxRent, setMaxRent] = useState(MAX_RENT_OPTIONS[0].value);
     const [sort, setSort] = useState(SORT_OPTIONS[0]);
-    const [showMap, setShowMap] = useState(false);
     const [amenitiesListing, setAmenitiesListing] = useState<Listing | null>(null);
-    const [selectedListing, setSelectedListing] = useState<Listing>(LISTINGS[0]);
 
     const filtered = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -486,41 +466,10 @@ export default function Rentals() {
 
     return (
         <div className="w-full bg-white">
-            {/* Search + listings summary, one row */}
-            <section className="px-6 pb-8 pt-14">
-                <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder='Enter a location, e.g. "Kilimani" or "2BR near Yaya Centre"'
-                            className="flex-1 rounded-lg border px-4 py-3 text-sm outline-none focus:ring-1"
-                            style={{ borderColor: BORDER, color: NAVY }}
-                        />
-                        <button
-                            className="rounded-lg px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
-                            style={{ background: BLUE }}
-                        >
-                            Search
-                        </button>
-                    </div>
-
-                    <div className="sm:text-right">
-                        <h1 className="text-2xl font-bold" style={{ color: NAVY }}>
-                            Current Listings
-                        </h1>
-                        <p className="mt-1 text-sm" style={{ color: MUTED }}>
-                            Showing {filtered.length} of {LISTINGS.length} available listings
-                        </p>
-                    </div>
-                </div>
-            </section>
-
             {/* Filter bar */}
-            <section className="px-6">
+            <section className="px-6 pt-14">
                 <div
-                    className="mx-auto grid max-w-6xl grid-cols-2 gap-4 rounded-2xl border p-5 sm:grid-cols-3 lg:grid-cols-6"
+                    className="mx-auto grid max-w-6xl grid-cols-2 gap-4 border p-5 sm:grid-cols-3 lg:grid-cols-5"
                     style={{ borderColor: BORDER, background: SURFACE }}
                 >
                     <div className="flex flex-col gap-1">
@@ -530,7 +479,7 @@ export default function Rentals() {
                         <select
                             value={neighborhood}
                             onChange={(e) => setNeighborhood(e.target.value)}
-                            className="rounded-lg border px-3 py-2 text-sm"
+                            className="border px-3 py-2 text-sm"
                             style={{ borderColor: BORDER, color: NAVY, background: "white" }}
                         >
                             {NEIGHBORHOODS.map((n) => (
@@ -546,7 +495,7 @@ export default function Rentals() {
                         <select
                             value={bedrooms}
                             onChange={(e) => setBedrooms(e.target.value)}
-                            className="rounded-lg border px-3 py-2 text-sm"
+                            className="border px-3 py-2 text-sm"
                             style={{ borderColor: BORDER, color: NAVY, background: "white" }}
                         >
                             {BEDROOM_OPTIONS.map((b) => (
@@ -562,7 +511,7 @@ export default function Rentals() {
                         <select
                             value={maxRent}
                             onChange={(e) => setMaxRent(Number(e.target.value))}
-                            className="rounded-lg border px-3 py-2 text-sm"
+                            className="border px-3 py-2 text-sm"
                             style={{ borderColor: BORDER, color: NAVY, background: "white" }}
                         >
                             {MAX_RENT_OPTIONS.map((m) => (
@@ -580,7 +529,7 @@ export default function Rentals() {
                         <select
                             value={sort}
                             onChange={(e) => setSort(e.target.value)}
-                            className="rounded-lg border px-3 py-2 text-sm"
+                            className="border px-3 py-2 text-sm"
                             style={{ borderColor: BORDER, color: NAVY, background: "white" }}
                         >
                             {SORT_OPTIONS.map((s) => (
@@ -591,18 +540,8 @@ export default function Rentals() {
 
                     <div className="flex items-end">
                         <button
-                            onClick={() => setShowMap((v) => !v)}
-                            className="w-full rounded-lg border px-3 py-2 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
-                            style={{ borderColor: BORDER, color: NAVY, background: "white" }}
-                        >
-                            {showMap ? "Hide Map" : "Show Map"}
-                        </button>
-                    </div>
-
-                    <div className="flex items-end">
-                        <button
                             onClick={clearFilters}
-                            className="w-full rounded-lg px-3 py-2 text-sm font-semibold"
+                            className="w-full px-3 py-2 text-sm font-semibold"
                             style={{ color: BLUE }}
                         >
                             Clear filters
@@ -611,41 +550,48 @@ export default function Rentals() {
                 </div>
             </section>
 
-            {/* Listings */}
-            <section className="px-6 py-14">
-                <div className="mx-auto max-w-6xl">
-                    <div className={showMap ? "grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]" : ""}>
-                        <div className="flex flex-col gap-6">
-                            {filtered.map((listing) => (
-                                <ListingCard
-                                    key={listing.id}
-                                    listing={listing}
-                                    onViewAmenities={setAmenitiesListing}
-                                    onSelect={showMap ? setSelectedListing : undefined}
-                                    selected={showMap && selectedListing.id === listing.id}
-                                />
-                            ))}
-                            {filtered.length === 0 && (
-                                <p className="rounded-xl border p-8 text-center text-sm" style={{ borderColor: BORDER, color: MUTED }}>
-                                    No listings match those filters yet. Try widening your search.
-                                </p>
-                            )}
-                        </div>
+            {/* Search + listings summary, one row, below the filters */}
+            <section className="px-6 pb-4 pt-8">
+                <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder='Enter a location, e.g. "Kilimani" or "2BR near Yaya Centre"'
+                            className="flex-1 border px-4 py-3 text-sm outline-none focus:ring-1"
+                            style={{ borderColor: BORDER, color: NAVY }}
+                        />
+                        <button
+                            className="px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
+                            style={{ background: BLUE }}
+                        >
+                            Search
+                        </button>
+                    </div>
 
-                        {showMap && (
-                            <div className="h-fit rounded-2xl border p-4 lg:sticky lg:top-6" style={{ borderColor: BORDER }}>
-                                <p className="mb-3 text-sm font-semibold" style={{ color: NAVY }}>
-                                    {selectedListing.title} · {selectedListing.neighborhood}
-                                </p>
-                                <div className="overflow-hidden rounded-xl">
-                                    <iframe
-                                        title="Selected listing map"
-                                        src={mapEmbedSrc(selectedListing.lat, selectedListing.lng)}
-                                        className="h-80 w-full lg:h-[520px]"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            </div>
+                    <div className="sm:text-right">
+                        <h1 className={`${playfair.className} text-2xl font-semibold`} style={{ color: NAVY }}>
+                            Current Listings
+                        </h1>
+                        <p className="mt-1 text-sm" style={{ color: MUTED }}>
+                            Showing {filtered.length} of {LISTINGS.length} available listings
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Listings */}
+            <section className="px-6 pb-14 pt-2">
+                <div className="mx-auto max-w-6xl">
+                    <div className="flex flex-col gap-6">
+                        {filtered.map((listing) => (
+                            <ListingCard key={listing.id} listing={listing} onViewAmenities={setAmenitiesListing} />
+                        ))}
+                        {filtered.length === 0 && (
+                            <p className="border p-8 text-center text-sm" style={{ borderColor: BORDER, color: MUTED }}>
+                                No listings match those filters yet. Try widening your search.
+                            </p>
                         )}
                     </div>
                 </div>
@@ -655,7 +601,7 @@ export default function Rentals() {
             <section className="px-6 py-16" style={{ background: SURFACE }}>
                 <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2">
                     <div>
-                        <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: NAVY }}>
+                        <h2 className={`${playfair.className} text-2xl font-semibold sm:text-3xl`} style={{ color: NAVY }}>
                             List free. Manage later — or never.
                         </h2>
                         <p className="mt-4 text-base leading-relaxed" style={{ color: MUTED }}>
@@ -666,25 +612,24 @@ export default function Rentals() {
                             later, upgrading takes five minutes — no re-listing required.
                         </p>
                         <button
-                            className="mt-6 w-fit rounded-lg px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
+                            className="mt-6 w-fit px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1B1B3A]"
                             style={{ background: BLUE }}
                         >
                             List Your Property — It&apos;s Free
                         </button>
                     </div>
 
-                    <div className="rounded-2xl bg-white p-8">
-                        <h3 className="text-lg font-semibold" style={{ color: NAVY }}>
+                    <div className="p-8" style={{ background: RED }}>
+                        <h3 className={`${playfair.className} text-lg font-semibold text-white`}>
                             Already managing on Flowspace?
                         </h3>
-                        <p className="mt-3 text-sm leading-relaxed" style={{ color: MUTED }}>
+                        <p className="mt-3 text-sm leading-relaxed text-white/90">
                             Publishing a vacant unit here takes one tap from your
                             dashboard — and approved inquiries convert straight into a
                             tenant with an auto-generated invite code.
                         </p>
                         <button
-                            className="mt-6 w-fit rounded-lg border px-6 py-3 text-sm font-semibold transition-colors hover:border-[#0066FF] hover:text-[#0066FF]"
-                            style={{ borderColor: BORDER, color: NAVY }}
+                            className="mt-6 w-fit border border-white px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#bb2036]"
                         >
                             Publish From My Dashboard
                         </button>
@@ -695,7 +640,7 @@ export default function Rentals() {
             {/* Prospective tenant flow */}
             <section className="px-6 py-16">
                 <div className="mx-auto max-w-4xl text-center">
-                    <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: NAVY }}>
+                    <h2 className={`${playfair.className} text-2xl font-semibold sm:text-3xl`} style={{ color: NAVY }}>
                         From browsing to move-in
                     </h2>
                 </div>
@@ -706,13 +651,11 @@ export default function Rentals() {
                         { step: "3", text: "Landlord approves — you get an invite code" },
                         { step: "4", text: "Download the app, enter your code, you're home" },
                     ].map((item) => (
-                        <div key={item.step} className="rounded-xl border p-6" style={{ borderColor: BORDER }}>
-                            <p className="text-2xl font-bold" style={{ color: RED }}>
+                        <div key={item.step} className="p-6" style={{ background: STEP_BG }}>
+                            <p className={`${playfair.className} text-2xl font-semibold`} style={{ color: "white" }}>
                                 {item.step}
                             </p>
-                            <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                                {item.text}
-                            </p>
+                            <p className="mt-2 text-sm text-white/90">{item.text}</p>
                         </div>
                     ))}
                 </div>
