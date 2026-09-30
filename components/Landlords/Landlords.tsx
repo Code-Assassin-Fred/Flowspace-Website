@@ -16,81 +16,63 @@ const NAVY = "#1B1B3A";
 const BLUE = "#0066FF";
 const RED = "#bb2036";
 const MUTED = "#3A3A52";
-const BORDER = "#E4E3EE";
 const SURFACE = "#F4F4F2";
+const CARD_BLUE = "#284d5b";
 
 type FeatureBlock = {
     title: string;
+    eyebrow: string;
     description: string;
-    bullets: string[];
 };
 
 const FEATURE_BLOCKS: FeatureBlock[] = [
     {
         title: "Dashboard",
-        description: "Know your numbers before your accountant does.",
-        bullets: [
-            "KPI cards: properties, rent collected, occupancy, open issues",
-            "Rent Collected vs Outstanding vs KRA Tax at a glance",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Know your numbers before your accountant does — KPI cards for properties, rent collected, occupancy, and open issues, plus a Rent Collected vs Outstanding vs KRA Tax breakdown at a glance.",
     },
     {
         title: "Properties & Units",
-        description: "Add a property once. Manage it forever.",
-        bullets: [
-            "Searchable property list with live occupancy",
-            "Time-limited caretaker invite codes",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Add a property once and manage it forever, with a searchable property list showing live occupancy and time-limited caretaker invite codes ready whenever you need them.",
     },
     {
         title: "Tenants & Caretakers",
-        description: "Onboard a tenant in under two minutes.",
-        bullets: [
-            "Manual onboarding or self-serve invite codes",
-            "Enable/disable accounts instantly",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Onboard a tenant in under two minutes — manually or with self-serve invite codes — and enable or disable accounts instantly.",
     },
     {
         title: "Payments & Finance",
-        description: "M-Pesa in, KRA tax out — automatically.",
-        bullets: [
-            "Real-time payment ledger across every property",
-            "Configurable KRA rate & caretaker pay (flat or % of revenue)",
-            "Per-property net income breakdown",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "M-Pesa in, KRA tax out, automatically: a real-time payment ledger across every property, configurable KRA rate and caretaker pay (flat or % of revenue), and a per-property net income breakdown.",
     },
     {
         title: "Complaints & Maintenance",
-        description: "Nothing falls through the cracks.",
-        bullets: [
-            "Status pipeline: Open → In Progress → Resolved",
-            "Full history per unit, per tenant",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Nothing falls through the cracks — every ticket is tracked through a clear Open → In Progress → Resolved pipeline, with a full history kept per unit and per tenant.",
     },
     {
         title: "Messages",
-        description: "Talk to one tenant or all of them.",
-        bullets: [
-            "Broadcast announcements or DM a single tenant",
-            "Read receipts on every message",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Talk to one tenant or all of them — broadcast announcements or DM a single tenant, with read receipts on every message.",
     },
     {
         title: "Utilities",
-        description: "Water, electricity, garbage — billed correctly, every time.",
-        bullets: [
-            "Per-unit rate configuration",
-            "Auto-calculated totals, no manual math",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Water, electricity, and garbage billed correctly every time, with per-unit rate configuration and totals calculated automatically — no manual math.",
     },
     {
         title: "Reports & Analytics",
-        description: "Board-ready reports, on demand.",
-        bullets: [
-            "Revenue, Occupancy, Maintenance, Utilities reports by period",
-            "One-tap PDF download",
-            "Marketplace analytics: listing views, inquiries, inquiry-to-tenant conversion",
-        ],
+        eyebrow: "Included in every plan",
+        description:
+            "Board-ready reports on demand: Revenue, Occupancy, Maintenance, and Utilities reports by period, one-tap PDF download, and Marketplace analytics covering listing views, inquiries, and inquiry-to-tenant conversion.",
     },
 ];
 
@@ -123,26 +105,16 @@ export default function Landlord() {
                     {FEATURE_BLOCKS.map((block) => (
                         <div
                             key={block.title}
-                            className="flex flex-col rounded-2xl border p-6"
-                            style={{ borderColor: BORDER }}
+                            className="flex flex-col p-8"
+                            style={{ background: CARD_BLUE }}
                         >
-                            <h3 className="text-lg font-semibold" style={{ color: NAVY }}>
-                                {block.title}
-                            </h3>
-                            <p className="mt-1 text-sm" style={{ color: MUTED }}>
+                            <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#6ea8ff" }}>
+                                {block.eyebrow}
+                            </span>
+                            <h3 className="mt-3 text-2xl font-bold text-white">{block.title}</h3>
+                            <p className="mt-4 text-sm leading-relaxed text-white/80">
                                 {block.description}
                             </p>
-                            <ul className="mt-4 flex flex-col gap-2.5 text-sm">
-                                {block.bullets.map((bullet) => (
-                                    <li
-                                        key={bullet}
-                                        className="border-l-2 pl-3"
-                                        style={{ borderColor: `${BLUE}66`, color: MUTED }}
-                                    >
-                                        {bullet}
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     ))}
                 </div>
